@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Football 2026 Game Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ecf0f1;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .stat-card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 8px 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .games-list {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr 1fr auto;
+            gap: 15px;
+            padding: 20px;
+            border-bottom: 1px solid #ecf0f1;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .game-item:hover {
+            background: #f8f9fa;
+        }
+
+        .game-item:last-child {
+            border-bottom: none;
+        }
+
+        .game-date {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .game-matchup {
+            font-size: 1.1em;
+        }
+
+        .game-score {
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+
+        .game-winner {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .win {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .loss {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tie {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .team-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .team-card.used {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+        }
+
+        .team-card.unused {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+        }
+
+        .team-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .team-usage {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏈 College Football 2026 Tracker</h1>
+            <p>Track your head-to-head games and team usage</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab" onclick="switchTab('add-game')">Add Game</button>
+            <button class="tab" onclick="switchTab('game-history')">Game History</button>
+            <button class="tab" onclick="switchTab('team-usage')">Team Usage</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="total-games">0</h3>
+                    <p>Total Games</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="player1-wins">0</h3>
+                    <p>Player 1 Wins</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="player2-wins">0</h3>
+                    <p>Player 2 Wins</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="total-ties">0</h3>
+                    <p>Ties</p>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Player Names</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="player1-name">Player 1 Name:</label>
+                        <input type="text" id="player1-name" placeholder="Enter player 1 name" onchange="updatePlayerNames()">
+                    </div>
+                    <div class="form-group">
+                        <label for="player2-name">Player 2 Name:</label>
+                        <input type="text" id="player2-name" placeholder="Enter player 2 name" onchange="updatePlayerNames()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Game Tab -->
+        <div id="add-game" class="tab-content">
+            <div class="form-section">
+                <h2>Add New Game</h2>
+                <form id="game-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="game-date">Date:</label>
+                            <input type="date" id="game-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="player1-team">Player 1 Team:</label>
+                            <select id="player1-team" required>
+                                <option value="">Select team...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="player2-team">Player 2 Team:</label>
+                            <select id="player2-team" required>
+                                <option value="">Select team...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="player1-score">Player 1 Score:</label>
+                            <input type="number" id="player1-score" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="player2-score">Player 2 Score:</label>
+                            <input type="number" id="player2-score" min="0" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Add Game</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Game History Tab -->
+        <div id="game-history" class="tab-content">
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filter-team">Filter by Team:</label>
+                    <select id="filter-team" onchange="filterGames()">
+                        <option value="">All Teams</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-result">Filter by Result:</label>
+                    <select id="filter-result" onchange="filterGames()">
+                        <option value="">All Results</option>
+                        <option value="win">Wins Only</option>
+                        <option value="loss">Losses Only</option>
+                        <option value="tie">Ties Only</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-date-from">From Date:</label>
+                    <input type="date" id="filter-date-from" onchange="filterGames()">
+                </div>
+                <div class="filter-group">
+                    <label for="filter-date-to">To Date:</label>
+                    <input type="date" id="filter-date-to" onchange="filterGames()">
+                </div>
+            </div>
+            
+            <div class="games-list" id="games-list">
+                <div class="empty-state">
+                    <h3>No games recorded yet!</h3>
+                    <p>Add your first game to start tracking your matches.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Usage Tab -->
+        <div id="team-usage" class="tab-content">
+            <div class="team-grid" id="team-grid">
+                <!-- Teams will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // College Football Teams (130 FBS teams)
+        const collegeTeams = [
+            "Alabama", "Auburn", "Arkansas", "Florida", "Georgia", "Kentucky", "LSU", "Mississippi State", "Missouri", "Ole Miss", "South Carolina", "Tennessee", "Texas A&M", "Vanderbilt",
+            "Boston College", "Clemson", "Duke", "Florida State", "Georgia Tech", "Louisville", "Miami", "NC State", "North Carolina", "Notre Dame", "Pittsburgh", "Syracuse", "Virginia", "Virginia Tech", "Wake Forest",
+            "Illinois", "Indiana", "Iowa", "Maryland", "Michigan", "Michigan State", "Minnesota", "Nebraska", "Northwestern", "Ohio State", "Penn State", "Purdue", "Rutgers", "Wisconsin",
+            "Baylor", "Cincinnati", "Houston", "Iowa State", "Kansas", "Kansas State", "Oklahoma", "Oklahoma State", "TCU", "Texas", "Texas Tech", "UCF", "West Virginia",
+            "Arizona", "Arizona State", "California", "Colorado", "Oregon", "Oregon State", "Stanford", "UCLA", "USC", "Utah", "Washington", "Washington State",
+            "Air Force", "Boise State", "Colorado State", "Fresno State", "Hawaii", "Nevada", "New Mexico", "San Diego State", "San Jose State", "UNLV", "Utah State", "Wyoming",
+            "Charlotte", "East Carolina", "FAU", "FIU", "Memphis", "Navy", "North Texas", "Rice", "SMU", "South Florida", "Temple", "Tulane", "Tulsa", "UAB", "UTSA",
+            "Akron", "Ball State", "Bowling Green", "Buffalo", "Central Michigan", "Eastern Michigan", "Kent State", "Miami (OH)", "Northern Illinois", "Ohio", "Toledo", "Western Michigan",
+            "Appalachian State", "Arkansas State", "Coastal Carolina", "Georgia Southern", "Georgia State", "James Madison", "Louisiana", "Louisiana Tech", "Louisiana Monroe", "Marshall", "Old Dominion", "South Alabama", "Southern Miss", "Texas State", "Troy",
+            "Army", "UConn", "UMass", "Liberty", "New Mexico State"
+        ];
+
+        // Application state
+        let games = JSON.parse(localStorage.getItem('cfb-games') || '[]');
+        let playerNames = JSON.parse(localStorage.getItem('cfb-players') || '{"player1": "Player 1", "player2": "Player 2"}');
+
+        // Initialize the app
+        function init() {
+            populateTeamSelects();
+            updatePlayerNames();
+            updateStats();
+            displayGames();
+            displayTeamUsage();
+            setTodayDate();
+        }
+
+        // Set today's date as default
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('game-date').value = today;
+        }
+
+        // Populate team dropdowns
+        function populateTeamSelects() {
+            const selects = ['player1-team', 'player2-team', 'filter-team'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (selectId === 'filter-team') {
+                    select.innerHTML = '<option value="">All Teams</option>';
+                } else {
+                    select.innerHTML = '<option value="">Select team...</option>';
+                }
+                collegeTeams.forEach(team => {
+                    const option = document.createElement('option');
+                    option.value = team;
+                    option.textContent = team;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        // Update player names
+        function updatePlayerNames() {
+            const player1Input = document.getElementById('player1-name');
+            const player2Input = document.getElementById('player2-name');
+            
+            if (player1Input.value) {
+                playerNames.player1 = player1Input.value;
+            } else {
+                player1Input.value = playerNames.player1;
+            }
+            
+            if (player2Input.value) {
+                playerNames.player2 = player2Input.value;
+            } else {
+                player2Input.value = playerNames.player2;
+            }
+            
+            localStorage.setItem('cfb-players', JSON.stringify(playerNames));
+            updateStats();
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Add new game
+        document.getElementById('game-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const gameData = {
+                id: Date.now(),
+                date: document.getElementById('game-date').value,
+                player1Team: document.getElementById('player1-team').value,
+                player2Team: document.getElementById('player2-team').value,
+                player1Score: parseInt(document.getElementById('player1-score').value),
+                player2Score: parseInt(document.getElementById('player2-score').value),
+                timestamp: new Date().toISOString()
+            };
+            
+            games.unshift(gameData);
+            localStorage.setItem('cfb-games', JSON.stringify(games));
+            
+            updateStats();
+            displayGames();
+            displayTeamUsage();
+            this.reset();
+            setTodayDate();
+            
+            alert('Game added successfully!');
+        });
+
+        // Update statistics
+        function updateStats() {
+            const totalGames = games.length;
+            let player1Wins = 0;
+            let player2Wins = 0;
+            let ties = 0;
+            
+            games.forEach(game => {
+                if (game.player1Score > game.player2Score) {
+                    player1Wins++;
+                } else if (game.player2Score > game.player1Score) {
+                    player2Wins++;
+                } else {
+                    ties++;
+                }
+            });
+            
+            document.getElementById('total-games').textContent = totalGames;
+            document.getElementById('player1-wins').textContent = player1Wins;
+            document.getElementById('player2-wins').textContent = player2Wins;
+            document.getElementById('total-ties').textContent = ties;
+        }
+
+        // Display games
+        function displayGames() {
+            const gamesList = document.getElementById('games-list');
+            
+            if (games.length === 0) {
+                gamesList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No games recorded yet!</h3>
+                        <p>Add your first game to start tracking your matches.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            gamesList.innerHTML = games.map(game => {
+                const winner = game.player1Score > game.player2Score ? 'win' : 
+                              game.player2Score > game.player1Score ? 'loss' : 'tie';
+                const resultText = winner === 'win' ? `${playerNames.player1} Won` :
+                                  winner === 'loss' ? `${playerNames.player2} Won` : 'Tie';
+                
+                return `
+                    <div class="game-item" data-game-id="${game.id}">
+                        <div class="game-date">${formatDate(game.date)}</div>
+                        <div class="game-matchup">
+                            <strong>${playerNames.player1}</strong> (${game.player1Team}) vs 
+                            <strong>${playerNames.player2}</strong> (${game.player2Team})
+                        </div>
+                        <div class="game-score">${game.player1Score} - ${game.player2Score}</div>
+                        <div class="game-winner ${winner}">${resultText}</div>
+                        <button class="delete-btn" onclick="deleteGame(${game.id})">Delete</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter games
+        function filterGames() {
+            const teamFilter = document.getElementById('filter-team').value;
+            const resultFilter = document.getElementById('filter-result').value;
+            const dateFromFilter = document.getElementById('filter-date-from').value;
+            const dateToFilter = document.getElementById('filter-date-to').value;
+            
+            let filteredGames = games;
+            
+            if (teamFilter) {
+                filteredGames = filteredGames.filter(game => 
+                    game.player1Team === teamFilter || game.player2Team === teamFilter
+                );
+            }
+            
+            if (resultFilter) {
+                filteredGames = filteredGames.filter(game => {
+                    const winner = game.player1Score > game.player2Score ? 'win' : 
+                                  game.player2Score > game.player1Score ? 'loss' : 'tie';
+                    return winner === resultFilter;
+                });
+            }
+            
+            if (dateFromFilter) {
+                filteredGames = filteredGames.filter(game => game.date >= dateFromFilter);
+            }
+            
+            if (dateToFilter) {
+                filteredGames = filteredGames.filter(game => game.date <= dateToFilter);
+            }
+            
+            displayFilteredGames(filteredGames);
+        }
+
+        // Display filtered games
+        function displayFilteredGames(filteredGames) {
+            const gamesList = document.getElementById('games-list');
+            
+            if (filteredGames.length === 0) {
+                gamesList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No games match your filters!</h3>
+                        <p>Try adjusting your filter criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            gamesList.innerHTML = filteredGames.map(game => {
+                const winner = game.player1Score > game.player2Score ? 'win' : 
+                              game.player2Score > game.player1Score ? 'loss' : 'tie';
+                const resultText = winner === 'win' ? `${playerNames.player1} Won` :
+                                  winner === 'loss' ? `${playerNames.player2} Won` : 'Tie';
+                
+                return `
+                    <div class="game-item" data-game-id="${game.id}">
+                        <div class="game-date">${formatDate(game.date)}</div>
+                        <div class="game-matchup">
+                            <strong>${playerNames.player1}</strong> (${game.player1Team}) vs 
+                            <strong>${playerNames.player2}</strong> (${game.player2Team})
+                        </div>
+                        <div class="game-score">${game.player1Score} - ${game.player2Score}</div>
+                        <div class="game-winner ${winner}">${resultText}</div>
+                        <button class="delete-btn" onclick="deleteGame(${game.id})">Delete</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Display team usage
+        function displayTeamUsage() {
+            const teamGrid = document.getElementById('team-grid');
+            const usedTeams = new Set();
+            const teamUsage = {};
+            
+            games.forEach(game => {
+                usedTeams.add(game.player1Team);
+                usedTeams.add(game.player2Team);
+                
+                teamUsage[game.player1Team] = (teamUsage[game.player1Team] || 0) + 1;
+                teamUsage[game.player2Team] = (teamUsage[game.player2Team] || 0) + 1;
+            });
+            
+            teamGrid.innerHTML = collegeTeams.map(team => {
+                const isUsed = usedTeams.has(team);
+                const usage = teamUsage[team] || 0;
+                
+                return `
+                    <div class="team-card ${isUsed ? 'used' : 'unused'}">
+                        <div class="team-name">${team}</div>
+                        <div class="team-usage">
+                            ${isUsed ? `Used ${usage} time${usage > 1 ? 's' : ''}` : 'Not used yet'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Delete game
+        function deleteGame(gameId) {
+            if (confirm('Are you sure you want to delete this game?')) {
+                games = games.filter(game => game.id !== gameId);
+                localStorage.setItem('cfb-games', JSON.stringify(games));
+                
+                updateStats();
+                displayGames();
+                displayTeamUsage();
+            }
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Initialize the app when page loads
+        init();
+    </script>
+</body>
+</html>
